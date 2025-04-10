@@ -81,3 +81,52 @@ print(fibo_df_optimized)
 
 # Salvando a tabela em um arquivo CSV 
 fibo_df_optimized.to_csv("fibonacci_results.csv", index=False)
+
+def edit_distance_recursive(s1, s2, i, j, contador=0):
+    # Caso base: uma das strings está vazia
+    if i == 0:
+        return j, contador + 1
+    if j == 0:
+        return i, contador + 1
+
+    # Se os caracteres forem iguais, não há custo
+    if s1[i - 1] == s2[j - 1]:
+        return edit_distance_recursive(s1, s2, i - 1, j - 1, contador + 1)
+
+    # Testa todas as operações possíveis: inserção, remoção e substituição
+    insert_cost, contador = edit_distance_recursive(s1, s2, i, j - 1, contador + 1)
+    remove_cost, contador = edit_distance_recursive(s1, s2, i - 1, j, contador + 1)
+    replace_cost, contador = edit_distance_recursive(s1, s2, i - 1, j - 1, contador + 1)
+
+    # Retorna o menor custo entre as operações
+    return 1 + min(insert_cost, remove_cost, replace_cost), contador
+
+
+# Função para calcular a distância de edição e contabilizar iterações
+def calculate_edit_distance(s1, s2):
+    distance, iterations = edit_distance_recursive(s1, s2, len(s1), len(s2))
+    return distance, iterations
+
+
+# Testando os casos fornecidos
+s1 = "Casablanca"
+s2 = "Portentoso"
+distance, iterations = calculate_edit_distance(s1, s2)
+print(f"Distância de edição entre '{s1}' e '{s2}': {distance}, Iterações: {iterations}")
+
+s1 = ("Maven, a Yiddish word meaning accumulator of knowledge, began as an attempt to "
+      "simplify the build processes in the Jakarta Turbine project. There were several"
+      " projects, each with their own Ant build files, that were all slightly different."
+      "JARs were checked into CVS. We wanted a standard way to build the projects, a clear "
+      "definition of what the project consisted of, an easy way to publish project information"
+      "and a way to share JARs across several projects. The result is a tool that can now be"
+      "used for building and managing any Java-based project. We hope that we have created "
+      "something that will make the day-to-day work of Java developers easier and generally help "
+      "with the comprehension of any Java-based project.")
+s2 = ("This post is not about deep learning. But it could be might as well. This is the power of "
+      "kernels. They are universally applicable in any machine learning algorithm. Why you might"
+      "ask? I am going to try to answer this question in this article."
+      "Go to the profile of Marin Vlastelica Pogančić"
+      "Marin Vlastelica Pogančić Jun")
+distance, iterations = calculate_edit_distance(s1, s2)
+print(f"Distância de edição entre os textos longos: {distance}, Iterações: {iterations}")
